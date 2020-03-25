@@ -1078,7 +1078,7 @@ def fix_signal(input_text):
     return output_text
   
 def HasIP(input_text):
-    if("192" in input_text):
+    if("10" in input_text):
         return True
     
     return False
