@@ -21,6 +21,7 @@ def runTest():
             ## Set test result default to FAIL
             test_result = "FAIL"       
             SW = "-"
+            SC = "-"
             MAC = "-"
             CASID = "-"
             Signal_HOR_Power = "-"
