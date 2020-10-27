@@ -233,6 +233,100 @@ def runTest():
                 TEST_CREATION_API.write_log_to_file("IP: " + str(IP))
                 
                 
+                video_result = NOS_API.compare_pictures("Tech_info_nc_ref", "Tech_info", "[SC]")
+                if(video_result >= TEST_CREATION_API.DEFAULT_HDMI_VIDEO_THRESHOLD):
+                    NOS_API.display_dialog("Confirme o cabo Eth", NOS_API.WAIT_TIME_TO_CLOSE_DIALOG)                                           
+                    TEST_CREATION_API.send_ir_rc_command("[REDO_SC]")
+                    time.sleep(0.5)
+                    if not(NOS_API.grab_picture("Tech_info_2")):
+                        TEST_CREATION_API.write_log_to_file("Image is not displayed on HDMI")
+                        NOS_API.update_test_slot_comment("Error code = " + NOS_API.test_cases_results_info.image_absence_hdmi_error_code \
+                                                            + "; Error message: " + NOS_API.test_cases_results_info.image_absence_hdmi_error_message)
+                        NOS_API.set_error_message("Video HDMI")
+                        error_codes = NOS_API.test_cases_results_info.image_absence_hdmi_error_code
+                        error_messages = NOS_API.test_cases_results_info.image_absence_hdmi_error_message
+                        
+                        NOS_API.add_test_case_result_to_file_report(
+                                    test_result,
+                                    "- - - - - - - - - - - - - - - - - - - -",
+                                    "- - - - - - - - - - - - - - - - - - - -",
+                                    error_codes,
+                                    error_messages)
+
+                        end_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S') 
+                        report_file = NOS_API.create_test_case_log_file(
+                                        NOS_API.test_cases_results_info.s_n_using_barcode,
+                                        NOS_API.test_cases_results_info.nos_sap_number,
+                                        NOS_API.test_cases_results_info.cas_id_using_barcode,
+                                        NOS_API.test_cases_results_info.mac_using_barcode,
+                                        end_time)
+                    
+                        NOS_API.upload_file_report(report_file)
+                        NOS_API.test_cases_results_info.isTestOK = False
+                                                
+                        NOS_API.send_report_over_mqtt_test_plan(
+                                test_result,
+                                end_time,
+                                error_codes,
+                                report_file)
+                                
+                        ## Update test result
+                        TEST_CREATION_API.update_test_result(test_result)
+                        
+                        ## Return DUT to initial state and de-initialize grabber device
+                        NOS_API.deinitialize()
+                        
+                        return
+                
+                    MAC = fix(TEST_CREATION_API.OCR_recognize_text("Tech_info_2", "[MAC]", "[KAON_FILTER]","MAC"))
+                    SW = fix(TEST_CREATION_API.OCR_recognize_text("Tech_info_2", "[SW]", "[KAON_FILTER]","SW"))
+                    CAS_ID = fix(TEST_CREATION_API.OCR_recognize_text("Tech_info_2", "[CASID]", "[KAON_FILTER]","CASID"))
+                    IP = TEST_CREATION_API.OCR_recognize_text("Tech_info_2", "[IP]", "[KAON_FILTER]","IP")
+                    TEST_CREATION_API.write_log_to_file("MAC: " + str(MAC))
+                    TEST_CREATION_API.write_log_to_file("SW Version : " + str(SW)) 
+                    TEST_CREATION_API.write_log_to_file("Cas ID: " + str(CAS_ID))
+                    TEST_CREATION_API.write_log_to_file("IP: " + str(IP))
+
+                    video_result = NOS_API.compare_pictures("Tech_info_nc_ref", "Tech_info_2", "[SC]")
+                    if(video_result >= TEST_CREATION_API.DEFAULT_HDMI_VIDEO_THRESHOLD):
+                        TEST_CREATION_API.write_log_to_file("Ethernet NOK") 
+                        NOS_API.update_test_slot_comment("Error code: " + NOS_API.test_cases_results_info.ethernet_nok_error_code \
+                                                        + "; Error message: " + NOS_API.test_cases_results_info.ethernet_nok_error_message)
+                        NOS_API.set_error_message("Eth")
+                        error_codes = NOS_API.test_cases_results_info.ethernet_nok_error_code
+                        error_messages = NOS_API.test_cases_results_info.ethernet_nok_error_message
+                        NOS_API.add_test_case_result_to_file_report(
+                                    test_result,
+                                    "- - - - - - - - - - - - - - - - - - - -",
+                                    "- - - - - - - - - - - - - - - - - - - -",
+                                    error_codes,
+                                    error_messages)
+
+                        end_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S') 
+                        report_file = NOS_API.create_test_case_log_file(
+                                        NOS_API.test_cases_results_info.s_n_using_barcode,
+                                        NOS_API.test_cases_results_info.nos_sap_number,
+                                        NOS_API.test_cases_results_info.cas_id_using_barcode,
+                                        NOS_API.test_cases_results_info.mac_using_barcode,
+                                        end_time)
+                    
+                        NOS_API.upload_file_report(report_file)
+                        NOS_API.test_cases_results_info.isTestOK = False
+                                                
+                        NOS_API.send_report_over_mqtt_test_plan(
+                                test_result,
+                                end_time,
+                                error_codes,
+                                report_file)
+                                
+                        ## Update test result
+                        TEST_CREATION_API.update_test_result(test_result)
+                        
+                        ## Return DUT to initial state and de-initialize grabber device
+                        NOS_API.deinitialize()
+                        
+                        return
+
                 video_result = NOS_API.compare_pictures("No_Card_ref", "Tech_info", "[SC]")
                 if(video_result >= TEST_CREATION_API.DEFAULT_HDMI_VIDEO_THRESHOLD):
                     NOS_API.display_dialog("Reinsira o cart\xe3o e de seguida pressiona Continuar", NOS_API.WAIT_TIME_TO_CLOSE_DIALOG)                                           
@@ -367,7 +461,7 @@ def runTest():
                     TEST_CREATION_API.write_log_to_file("CAS ID number and CAS ID number previuosly scanned by barcode scanner is not the same")
                     NOS_API.update_test_slot_comment("Error code: " + NOS_API.test_cases_results_info.wrong_cas_id_error_code \
                                                             + "; Error message: " + NOS_API.test_cases_results_info.wrong_cas_id_error_message \
-                                                            + "; OCR: " + str(cas_id_number))
+                                                            + "; OCR: " + str(CAS_ID))
                     NOS_API.set_error_message("CAS ID")
                     error_codes = NOS_API.test_cases_results_info.wrong_cas_id_error_code
                     error_messages = NOS_API.test_cases_results_info.wrong_cas_id_error_message

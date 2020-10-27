@@ -231,8 +231,10 @@ def runTest():
                     
                     video_result = NOS_API.compare_pictures("CH4_ref", "CH4", "[HALF_SCREEN_1080]")
                     video_result1 = NOS_API.compare_pictures("CH4_ref1", "CH4", "[HALF_SCREEN_1080]")
+                    video_result2 = NOS_API.compare_pictures("CH4_ref2", "CH4", "[HALF_SCREEN_1080]")
+                    video_result3 = NOS_API.compare_pictures("CH4_ref3", "CH4", "[HALF_SCREEN_1080]")
                     #if(video_result_ch4 > TEST_CREATION_API.DEFAULT_HDMI_VIDEO_THRESHOLD or video_result_ch4_1 > TEST_CREATION_API.DEFAULT_HDMI_VIDEO_THRESHOLD or (video_result < 20 and video_result1 < 20)):
-                    if(video_result < TEST_CREATION_API.DEFAULT_HDMI_VIDEO_THRESHOLD and video_result1 < TEST_CREATION_API.DEFAULT_HDMI_VIDEO_THRESHOLD): 
+                    if(video_result < TEST_CREATION_API.DEFAULT_HDMI_VIDEO_THRESHOLD and video_result1 < TEST_CREATION_API.DEFAULT_HDMI_VIDEO_THRESHOLD and video_result2 < TEST_CREATION_API.DEFAULT_HDMI_VIDEO_THRESHOLD and video_result3 < TEST_CREATION_API.DEFAULT_HDMI_VIDEO_THRESHOLD): 
                         TEST_CREATION_API.send_ir_rc_command("[CH_4]")
                         time.sleep(1)
                         TEST_CREATION_API.send_ir_rc_command("[EXIT]")
@@ -282,8 +284,10 @@ def runTest():
 
                         video_result = NOS_API.compare_pictures("CH4_ref", "CH4", "[HALF_SCREEN_1080]")
                         video_result1 = NOS_API.compare_pictures("CH4_ref1", "CH4", "[HALF_SCREEN_1080]")
+                        video_result2 = NOS_API.compare_pictures("CH4_ref2", "CH4", "[HALF_SCREEN_1080]")
+                        video_result3 = NOS_API.compare_pictures("CH4_ref3", "CH4", "[HALF_SCREEN_1080]")
                     
-                    if(video_result >= TEST_CREATION_API.DEFAULT_HDMI_VIDEO_THRESHOLD or video_result1 >= TEST_CREATION_API.DEFAULT_HDMI_VIDEO_THRESHOLD):
+                    if(video_result >= TEST_CREATION_API.DEFAULT_HDMI_VIDEO_THRESHOLD or video_result1 >= TEST_CREATION_API.DEFAULT_HDMI_VIDEO_THRESHOLD or video_result2 >= TEST_CREATION_API.DEFAULT_HDMI_VIDEO_THRESHOLD  or video_result3 >= TEST_CREATION_API.DEFAULT_HDMI_VIDEO_THRESHOLD):
                         ch4_video_result = True
                     else:
                         TEST_CREATION_API.write_log_to_file("Channel with RT-RK color bar pattern was not playing on HDMI 1080p.")
@@ -480,13 +484,15 @@ def runTest():
                                 ## Compare grabbed and expected image and get result of comparison
                                 video_result = NOS_API.compare_pictures("HDMI_video_1080_ref", "HDMI_video_1080p", "[HALF_SCREEN_1080]")
                                 video_result1 = NOS_API.compare_pictures("HDMI_video_1080_ref1", "HDMI_video_1080p", "[HALF_SCREEN_1080]")
+                                video_result2 = NOS_API.compare_pictures("HDMI_video_1080_ref2", "HDMI_video_1080p", "[HALF_SCREEN_1080]")
+                                video_result3 = NOS_API.compare_pictures("HDMI_video_1080_ref3", "HDMI_video_1080p", "[HALF_SCREEN_1080]")
                         
                             except:
                                 i = i + 1
                                 continue
                         
                             ## Check video analysis results and update comments
-                            if (video_result >= TEST_CREATION_API.DEFAULT_HDMI_VIDEO_THRESHOLD or video_result1 >= TEST_CREATION_API.DEFAULT_HDMI_VIDEO_THRESHOLD):
+                            if (video_result >= TEST_CREATION_API.DEFAULT_HDMI_VIDEO_THRESHOLD or video_result1 >= TEST_CREATION_API.DEFAULT_HDMI_VIDEO_THRESHOLD or video_result2 >= TEST_CREATION_API.DEFAULT_HDMI_VIDEO_THRESHOLD or video_result3 >= TEST_CREATION_API.DEFAULT_HDMI_VIDEO_THRESHOLD):
                                 i = 0
                                 if (analysed_video): 
                                     ch1_1080_result = True
@@ -793,13 +799,15 @@ def runTest():
                                         ## Compare grabbed and expected image and get result of comparison
                                         video_result = NOS_API.compare_pictures("HDMI_video_ref", "HDMI_video", "[HALF_SCREEN_720]")
                                         video_result1 = NOS_API.compare_pictures("HDMI_video_ref1", "HDMI_video", "[HALF_SCREEN_720]")
+                                        video_result2 = NOS_API.compare_pictures("HDMI_video_ref2", "HDMI_video", "[HALF_SCREEN_720]")
+                                        video_result3 = NOS_API.compare_pictures("HDMI_video_ref3", "HDMI_video", "[HALF_SCREEN_720]")
                                 
                                     except:
                                         i = i + 1
                                         continue
                                 
                                     ## Check video analysis results and update comments
-                                    if (video_result >= TEST_CREATION_API.DEFAULT_HDMI_VIDEO_THRESHOLD or video_result1 >= TEST_CREATION_API.DEFAULT_HDMI_VIDEO_THRESHOLD):
+                                    if (video_result >= TEST_CREATION_API.DEFAULT_HDMI_VIDEO_THRESHOLD or video_result1 >= TEST_CREATION_API.DEFAULT_HDMI_VIDEO_THRESHOLD or video_result2 >= TEST_CREATION_API.DEFAULT_HDMI_VIDEO_THRESHOLD or video_result3 >= TEST_CREATION_API.DEFAULT_HDMI_VIDEO_THRESHOLD):
                                         i = 0
                                         if (analysed_video): 
                                             ch1_720_result = True
@@ -925,13 +933,15 @@ def runTest():
                                 
                                                     ## Compare grabbed and expected image and get result of comparison
                                                     video_result = NOS_API.compare_pictures("SCART_video_ref", "SCART_video", "[HALF_SCREEN_576p]")
+                                                    video_result1 = NOS_API.compare_pictures("SCART_video_ref1", "SCART_video", "[HALF_SCREEN_576p]")
+                                                    video_result2 = NOS_API.compare_pictures("SCART_video_ref2", "SCART_video", "[HALF_SCREEN_576p]")
                                             
                                                 except:
                                                     i = i + 1
                                                     continue
                                             
                                                 ## Check video analysis results and update comments
-                                                if (video_result >= NOS_API.DEFAULT_CVBS_VIDEO_THRESHOLD):
+                                                if (video_result >= NOS_API.DEFAULT_CVBS_VIDEO_THRESHOLD or video_result1 >= NOS_API.DEFAULT_CVBS_VIDEO_THRESHOLD or video_result2 >= NOS_API.DEFAULT_CVBS_VIDEO_THRESHOLD):
                                                     ## Set test result to PASS
                                                     #test_result_SCART_video = True
                                                     #test_result = "PASS"
@@ -972,9 +982,7 @@ def runTest():
                                         global Descramble_NOK
                                         global Video_Decoding_NOK
                                         counter = 0
-                                    
-                                    
-                                    
+
                                         TEST_CREATION_API.grabber_start_video_source(TEST_CREATION_API.VideoInterface.HDMI1)
                                         time.sleep(2)        
                                     
@@ -982,8 +990,8 @@ def runTest():
                                             ## Enter autodiag        
                                             TEST_CREATION_API.send_ir_rc_command("[ENTER_AUTODIAG]")
                                             
-                                            AutoDiag_image = NOS_API.wait_for_multiple_pictures(["Autodiag_End_720_ref","Autodiag_End_refblack"], 45, ["[AUTODIAG_PROGRESS]","[AUTODIAG_PROGRESS]"], [TEST_CREATION_API.DEFAULT_HDMI_VIDEO_THRESHOLD,TEST_CREATION_API.DEFAULT_HDMI_VIDEO_THRESHOLD])
-                                            if(AutoDiag_image == 0 or AutoDiag_image == 1):
+                                            AutoDiag_image = NOS_API.wait_for_multiple_pictures(["Autodiag_End_720_ref", "Autodiag_End_720_ref1", "Autodiag_End_refblack"], 45, ["[AUTODIAG_PROGRESS]", "[AUTODIAG_PROGRESS]", "[AUTODIAG_PROGRESS]"], [TEST_CREATION_API.DEFAULT_HDMI_VIDEO_THRESHOLD, TEST_CREATION_API.DEFAULT_HDMI_VIDEO_THRESHOLD, TEST_CREATION_API.DEFAULT_HDMI_VIDEO_THRESHOLD])
+                                            if(AutoDiag_image == 0 or AutoDiag_image == 1 or AutoDiag_image == 2):
                                                 if not(NOS_API.grab_picture("AutoDiag_Result")):
                                                     TEST_CREATION_API.write_log_to_file("Image is not displayed on HDMI")
                                                     NOS_API.update_test_slot_comment("Error code = " + NOS_API.test_cases_results_info.image_absence_hdmi_error_code \
@@ -1041,8 +1049,6 @@ def runTest():
                                                         error_codes = NOS_API.test_cases_results_info.measure_boot_time_error_code
                                                         error_messages = NOS_API.test_cases_results_info.measure_boot_time_error_message
                                                         break
-                                            
-                                                
                                                 else:
                                                     if(counter == 0 and USB_NOK):
                                                         NOS_API.display_custom_dialog("Confirme o cabo USB", 1, ["Continuar"], NOS_API.WAIT_TIME_TO_CLOSE_DIALOG)
@@ -1130,8 +1136,6 @@ def runTest():
                                                         NOS_API.deinitialize()
                                                         
                                                         return
-                                                        
-                                                        
                                             else:
                                                 if(counter < 2):
                                                     TEST_CREATION_API.send_ir_rc_command("[BACK]")
