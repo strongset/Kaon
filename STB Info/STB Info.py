@@ -281,7 +281,7 @@ def runTest():
                     MAC = fix(TEST_CREATION_API.OCR_recognize_text("Tech_info_2", "[MAC]", "[KAON_FILTER]","MAC"))
                     SW = fix(TEST_CREATION_API.OCR_recognize_text("Tech_info_2", "[SW]", "[KAON_FILTER]","SW"))
                     CAS_ID = fix(TEST_CREATION_API.OCR_recognize_text("Tech_info_2", "[CASID]", "[KAON_FILTER]","CASID"))
-                    IP = TEST_CREATION_API.OCR_recognize_text("Tech_info_2", "[IP]", "[KAON_FILTER]","IP")
+                    IP = TEST_CREATION_API.OCR_recognize_text("Tech_info_2", "[IP]", "[KAON_FILTER]","IP").replace("|", "1")
                     TEST_CREATION_API.write_log_to_file("MAC: " + str(MAC))
                     TEST_CREATION_API.write_log_to_file("SW Version : " + str(SW)) 
                     TEST_CREATION_API.write_log_to_file("Cas ID: " + str(CAS_ID))
