@@ -92,6 +92,12 @@ def runTest():
                             NOS_API.deinitialize()
                             return                     
             
+            ## Set volume to max
+            TEST_CREATION_API.send_ir_rc_command("[VOL_MIN]")
+            
+            ## Set volume to half, because if vol is max, signal goes in saturation
+            TEST_CREATION_API.send_ir_rc_command("[VOL_PLUS_HALF]")
+
             ## Start grabber device with audio on SCART audio source
             TEST_CREATION_API.grabber_start_audio_source(TEST_CREATION_API.AudioInterface.LINEIN2)
             time.sleep(2)
@@ -176,7 +182,7 @@ def runTest():
                     TEST_CREATION_API.send_ir_rc_command("[VOL_PLUS_HALF]")
                 
                     ## Zap to service
-                    TEST_CREATION_API.send_ir_rc_command("[CH_4]")
+                    TEST_CREATION_API.send_ir_rc_command("[CH_11]")
                     TEST_CREATION_API.send_ir_rc_command("[EXIT]")
                     TEST_CREATION_API.send_ir_rc_command("[EXIT]")  
                     time.sleep(3)
@@ -235,7 +241,7 @@ def runTest():
                     video_result3 = NOS_API.compare_pictures("CH4_ref3", "CH4", "[HALF_SCREEN_1080]")
                     #if(video_result_ch4 > TEST_CREATION_API.DEFAULT_HDMI_VIDEO_THRESHOLD or video_result_ch4_1 > TEST_CREATION_API.DEFAULT_HDMI_VIDEO_THRESHOLD or (video_result < 20 and video_result1 < 20)):
                     if(video_result < TEST_CREATION_API.DEFAULT_HDMI_VIDEO_THRESHOLD and video_result1 < TEST_CREATION_API.DEFAULT_HDMI_VIDEO_THRESHOLD and video_result2 < TEST_CREATION_API.DEFAULT_HDMI_VIDEO_THRESHOLD and video_result3 < TEST_CREATION_API.DEFAULT_HDMI_VIDEO_THRESHOLD): 
-                        TEST_CREATION_API.send_ir_rc_command("[CH_4]")
+                        TEST_CREATION_API.send_ir_rc_command("[CH_11]")
                         time.sleep(1)
                         TEST_CREATION_API.send_ir_rc_command("[EXIT]")
                         TEST_CREATION_API.send_ir_rc_command("[EXIT]")  
@@ -301,7 +307,7 @@ def runTest():
                     if(ch4_video_result):
                     
                     
-                        TEST_CREATION_API.send_ir_rc_command("[CH_3]")
+                        TEST_CREATION_API.send_ir_rc_command("[CH_40]")
                         TEST_CREATION_API.send_ir_rc_command("[EXIT]")
                         TEST_CREATION_API.send_ir_rc_command("[EXIT]")  
                         time.sleep(3)
@@ -502,7 +508,7 @@ def runTest():
                                 break
                             i = i + 1
                             TEST_CREATION_API.send_ir_rc_command("[BACK]")
-                            TEST_CREATION_API.send_ir_rc_command("[CH_3]")
+                            TEST_CREATION_API.send_ir_rc_command("[CH_40]")
                             TEST_CREATION_API.send_ir_rc_command("[EXIT]")
                             TEST_CREATION_API.send_ir_rc_command("[EXIT]")
                         if (i >= 3):
@@ -817,7 +823,7 @@ def runTest():
                                         break
                                     i = i + 1
                                     TEST_CREATION_API.send_ir_rc_command("[BACK]")
-                                    TEST_CREATION_API.send_ir_rc_command("[CH_3]")
+                                    TEST_CREATION_API.send_ir_rc_command("[CH_40]")
                                     TEST_CREATION_API.send_ir_rc_command("[EXIT]")
                                     TEST_CREATION_API.send_ir_rc_command("[EXIT]")
                                 if (i >= 3):

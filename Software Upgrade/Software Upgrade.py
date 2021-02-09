@@ -377,7 +377,7 @@ def runTest():
                             if(NOS_API.wait_for_signal_present(30)):           
                                 Update_Screen = NOS_API.wait_for_multiple_pictures(["SW_Update_720_REF", "SW_Update_720_REF_1"], 30, ["[Update_720]", "[Update_720]"], [HDMI_Threshold, HDMI_Threshold])
                                 if(Update_Screen == 0 or Update_Screen == 1):
-                                    Update_image = NOS_API.wait_for_multiple_pictures(["SW_Update_Success_720_REF"], 110, ["[Update_Success_720]"], [NOS_API.thres])
+                                    Update_image = NOS_API.wait_for_multiple_pictures(["SW_Update_Success_720_REF"], 600, ["[Update_Success_720]"], [NOS_API.thres])
                                     if(Update_image == 0):
                                         NOS_API.test_cases_results_info.DidUpgrade = 1
                                         SW_Upgrade = True
@@ -702,9 +702,71 @@ def runTest():
                     return
         
                 if(SW_Upgrade):
-                    boot_image = NOS_API.wait_for_multiple_pictures(["Install_ref","Install_ref_1","HDMI_Video_1080_ref","HDMI_Video_1080_ref_1","HDMI_Video_1080_ref_2","HDMI_Video_720_ref","HDMI_Video_720_ref_1","HDMI_Video_720_ref_2","No_signal_1080p_ref","No_signal_720p_ref"], 90, ["[Install_menu]","[Install_menu]","[HALF_SCREEN_1080]","[HALF_SCREEN_1080]","[HALF_SCREEN_1080]","[HALF_SCREEN_720]","[HALF_SCREEN_720]","[HALF_SCREEN_720]","[NO_SIGNAL_1080]","[NO_SIGNAL_720]"], [HDMI_Threshold,HDMI_Threshold,HDMI_Threshold,HDMI_Threshold,HDMI_Threshold,HDMI_Threshold,HDMI_Threshold,HDMI_Threshold,HDMI_Threshold,HDMI_Threshold])
+                    boot_image = NOS_API.wait_for_multiple_pictures(["Install_ref","Install_ref_1","HDMI_Video_1080_ref","HDMI_Video_1080_ref_1","HDMI_Video_1080_ref_2","HDMI_Video_720_ref","HDMI_Video_720_ref_1","HDMI_Video_720_ref_2","No_signal_1080p_ref","No_signal_720p_ref","No_signal_720p_new_ref","Search_Channels_ref", "Search_Channels1080_ref"], 90, ["[Install_menu]","[Install_menu]","[HALF_SCREEN_1080]","[HALF_SCREEN_1080]","[HALF_SCREEN_1080]","[HALF_SCREEN_720]","[HALF_SCREEN_720]","[HALF_SCREEN_720]","[NO_SIGNAL_1080]","[NO_SIGNAL_720]","[NO_SIGNAL_720]","[Search_Channels]","[Search_Channels_1080]"], [HDMI_Threshold,HDMI_Threshold,HDMI_Threshold,HDMI_Threshold,HDMI_Threshold,HDMI_Threshold,HDMI_Threshold,HDMI_Threshold,HDMI_Threshold,HDMI_Threshold,HDMI_Threshold,HDMI_Threshold,HDMI_Threshold])
                     TEST_CREATION_API.write_log_to_file(boot_image)
-                    if(boot_image == 0 or boot_image == 1):
+                    if boot_image == 11 or boot_image == 12:
+                        result = 0
+                        start_time = int(time.time())
+                        while(result == 0 or result == 1):
+                            time.sleep(5)
+                            result = NOS_API.wait_for_multiple_pictures(["Search_Channels_ref","Search_Channels1080_ref"], 2, ["[Search_Channels]","[Search_Channels_1080]"], [HDMI_Threshold, HDMI_Threshold])
+                            timeout = int(time.time()) - start_time
+                            if (timeout > 240):
+                                TEST_CREATION_API.write_log_to_file("Image is not displayed on HDMI")
+                                NOS_API.update_test_slot_comment("Error code = " + NOS_API.test_cases_results_info.image_absence_hdmi_error_code \
+                                                        + "; Error message: " + NOS_API.test_cases_results_info.image_absence_hdmi_error_message)
+                                NOS_API.set_error_message("Video HDMI")
+                                error_codes = NOS_API.test_cases_results_info.image_absence_hdmi_error_code
+                                error_messages = NOS_API.test_cases_results_info.image_absence_hdmi_error_message
+                                test_result = "FAIL"
+                                
+                                NOS_API.add_test_case_result_to_file_report(
+                                                test_result,
+                                                "- - - - - - - - - - - - - - - - - - - -",
+                                                "- - - - - - - - - - - - - - - - - - - -",
+                                                error_codes,
+                                                error_messages)
+                                end_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S') 
+                                report_file = ""
+                                if (test_result != "PASS"):
+                                    report_file = NOS_API.create_test_case_log_file(
+                                                    NOS_API.test_cases_results_info.s_n_using_barcode,
+                                                    NOS_API.test_cases_results_info.nos_sap_number,
+                                                    NOS_API.test_cases_results_info.cas_id_using_barcode,
+                                                    NOS_API.test_cases_results_info.mac_using_barcode,
+                                                    end_time)
+                                    NOS_API.upload_file_report(report_file)
+                                    NOS_API.test_cases_results_info.isTestOK = False
+
+
+                                ## Update test result
+                                TEST_CREATION_API.update_test_result(test_result)
+                                
+                                ## Return DUT to initial state and de-initialize grabber device
+                                NOS_API.deinitialize()
+                                
+                                NOS_API.send_report_over_mqtt_test_plan(
+                                    test_result,
+                                    end_time,
+                                    error_codes,
+                                    report_file)
+                                return        
+
+                        time.sleep(10)
+                        TEST_CREATION_API.send_ir_rc_command("[CH_40]")
+                        Status_Image = NOS_API.wait_for_multiple_pictures(["HDMI_Video_1080_ref","HDMI_Video_1080_ref_1","HDMI_Video_1080_ref_2","HDMI_Video_720_ref","HDMI_Video_720_ref_1","HDMI_Video_720_ref_2"], 5, ["[HALF_SCREEN_1080]","[HALF_SCREEN_1080]","[HALF_SCREEN_1080]","[HALF_SCREEN_720]","[HALF_SCREEN_720]","[HALF_SCREEN_720]"], [HDMI_Threshold,HDMI_Threshold,HDMI_Threshold,HDMI_Threshold,HDMI_Threshold,HDMI_Threshold])
+                        if(Status_Image >= 0 and Status_Image <= 5): 
+                            if(Status_Image == 3 or Status_Image == 4 or Status_Image == 5):
+                                NOS_API.SET_720 = True
+                            test_result = "PASS"
+                        else:
+                            TEST_CREATION_API.write_log_to_file("Image is not reproduced correctly on HDMI.")
+                            NOS_API.update_test_slot_comment("Error code: " + NOS_API.test_cases_results_info.hdmi_1080p_noise_error_code \
+                                                                + "; Error message: " + NOS_API.test_cases_results_info.hdmi_1080p_noise_error_message)
+                            error_codes = NOS_API.test_cases_results_info.hdmi_1080p_noise_error_code
+                            error_messages = NOS_API.test_cases_results_info.hdmi_1080p_noise_error_message
+                            NOS_API.set_error_message("Video HDMI")
+                    elif(boot_image == 0 or boot_image == 1):
                         TEST_CREATION_API.send_ir_rc_command("[OK]")
                         signal_image = NOS_API.wait_for_multiple_pictures(["Install_ref","Install_ref_1","Set_signal_ref"], 10, ["[Install_menu]","[Install_menu]","[NO_INSTALL]"], [HDMI_Threshold,HDMI_Threshold,HDMI_Threshold])
                         if(signal_image == 0 or signal_image == 1):
@@ -842,19 +904,19 @@ def runTest():
                         Install_image = NOS_API.wait_for_multiple_pictures(["Install_Success_ref", "Install_Success_ref2", "Install_Success_ref3"], 5, ["[SEARCH]", "[SEARCH_720]", "[SEARCH_720]"], [HDMI_Threshold, HDMI_Threshold, HDMI_Threshold])
                         if(Install_image != 0 and Install_image != 1 and Install_image != 2):
                             TEST_CREATION_API.send_ir_rc_command("[OK]")
-                        Install_Success_image = NOS_API.wait_for_multiple_pictures(["Install_Success_ref","Install_Success_ref1","Install_Success_ref2", "Install_Success_ref3"], 30, ["[SUCCESS_INSTALL]","[SUCCESS_INSTALL]","[SUCCESS_INSTALL_720]","[SUCCESS_INSTALL_720]"], [HDMI_Threshold,HDMI_Threshold,HDMI_Threshold,HDMI_Threshold])
+                        Install_Success_image = NOS_API.wait_for_multiple_pictures(["Install_Success_ref","Install_Success_ref1","Install_Success_ref2", "Install_Success_ref3"], 300, ["[SUCCESS_INSTALL]","[SUCCESS_INSTALL]","[SUCCESS_INSTALL_720]","[SUCCESS_INSTALL_720]"], [HDMI_Threshold,HDMI_Threshold,HDMI_Threshold,HDMI_Threshold])
                         
                         if(Install_Success_image == 0 or Install_Success_image == 1):
                             TEST_CREATION_API.send_ir_rc_command("[OK]")
                             TEST_CREATION_API.send_ir_rc_command("[BACK]")
-                            TEST_CREATION_API.send_ir_rc_command("[CH_3]")
+                            TEST_CREATION_API.send_ir_rc_command("[CH_40]")
                         elif(Install_Success_image == 2 or Install_Success_image == 3):
                             TEST_CREATION_API.send_ir_rc_command("[OK]")
                             TEST_CREATION_API.send_ir_rc_command("[BACK]")
-                            TEST_CREATION_API.send_ir_rc_command("[CH_3]")
+                            TEST_CREATION_API.send_ir_rc_command("[CH_40]")
                             time.sleep(10)
                             TEST_CREATION_API.send_ir_rc_command("[BACK]")
-                            TEST_CREATION_API.send_ir_rc_command("[CH_3]")
+                            TEST_CREATION_API.send_ir_rc_command("[CH_40]")
                         else:
                             TEST_CREATION_API.write_log_to_file("Signal value is lower than threshold") 
                             TEST_CREATION_API.write_log_to_file("Falhou a meio da atualização")                                 
@@ -956,10 +1018,10 @@ def runTest():
                             NOS_API.SET_720 = True
                         test_result = "PASS"
                     
-                    elif(boot_image == -1 or (boot_image >= 8 and boot_image <= 9)):
+                    elif(boot_image == -1 or (boot_image >= 8 and boot_image <= 10)):
                         if(boot_image == -1):
-                            TEST_CREATION_API.send_ir_rc_command("[CH_3]")
-                            Status_Image = NOS_API.wait_for_multiple_pictures(["HDMI_Video_1080_ref","HDMI_Video_1080_ref_1","HDMI_Video_1080_ref_2","HDMI_Video_720_ref","HDMI_Video_720_ref_1","HDMI_Video_720_ref_2"], 5, ["[HALF_SCREEN_1080]","[HALF_SCREEN_1080]","[HALF_SCREEN_1080]","[HALF_SCREEN_720]","[HALF_SCREEN_720]","[HALF_SCREEN_720]"], [HDMI_Threshold,HDMI_Threshold,HDMI_Threshold,HDMI_Threshold,HDMI_Threshold,HDMI_Threshold])
+                            TEST_CREATION_API.send_ir_rc_command("[CH_40]")
+                            Status_Image = NOS_API.wait_for_multiple_pictures(["HDMI_Video_1080_ref","HDMI_Video_1080_ref_1","HDMI_Video_1080_ref_2","HDMI_Video_720_ref","HDMI_Video_720_ref_1","HDMI_Video_720_ref_2"], 10, ["[HALF_SCREEN_1080]","[HALF_SCREEN_1080]","[HALF_SCREEN_1080]","[HALF_SCREEN_720]","[HALF_SCREEN_720]","[HALF_SCREEN_720]"], [HDMI_Threshold,HDMI_Threshold,HDMI_Threshold,HDMI_Threshold,HDMI_Threshold,HDMI_Threshold])
                             if(Status_Image >= 0 and Status_Image <= 5): 
                                 if(Status_Image == 3 or Status_Image == 4 or Status_Image == 5):
                                     NOS_API.SET_720 = True
@@ -1190,19 +1252,19 @@ def runTest():
                                 Install_image = NOS_API.wait_for_multiple_pictures(["Install_Success_ref","Install_Success_ref2", "Install_Success_ref3"], 5, ["[SEARCH]", "[SEARCH_720]", "[SEARCH_720]"], [HDMI_Threshold, HDMI_Threshold, HDMI_Threshold])
                                 if(Install_image != 0 and Install_image != 1 and Install_image != 2):
                                     TEST_CREATION_API.send_ir_rc_command("[OK]")
-                                Install_Success_image = NOS_API.wait_for_multiple_pictures(["Install_Success_ref","Install_Success_ref1","Install_Success_ref2", "Install_Success_ref3"], 30, ["[SUCCESS_INSTALL]","[SUCCESS_INSTALL]", "[SUCCESS_INSTALL_720]", "[SUCCESS_INSTALL_720]"], [HDMI_Threshold,HDMI_Threshold,HDMI_Threshold,HDMI_Threshold])
+                                Install_Success_image = NOS_API.wait_for_multiple_pictures(["Install_Success_ref","Install_Success_ref1","Install_Success_ref2", "Install_Success_ref3"], 300, ["[SUCCESS_INSTALL]","[SUCCESS_INSTALL]", "[SUCCESS_INSTALL_720]", "[SUCCESS_INSTALL_720]"], [HDMI_Threshold,HDMI_Threshold,HDMI_Threshold,HDMI_Threshold])
                                 
                                 if(Install_Success_image == 0 or Install_Success_image == 1):
                                     TEST_CREATION_API.send_ir_rc_command("[OK]")
                                     TEST_CREATION_API.send_ir_rc_command("[BACK]")
-                                    TEST_CREATION_API.send_ir_rc_command("[CH_3]")
+                                    TEST_CREATION_API.send_ir_rc_command("[CH_40]")
                                 elif(Install_Success_image == 2 or Install_Success_image == 3):
                                     TEST_CREATION_API.send_ir_rc_command("[OK]")
                                     TEST_CREATION_API.send_ir_rc_command("[BACK]")
-                                    TEST_CREATION_API.send_ir_rc_command("[CH_3]")
+                                    TEST_CREATION_API.send_ir_rc_command("[CH_40]")
                                     time.sleep(10)
                                     TEST_CREATION_API.send_ir_rc_command("[BACK]")
-                                    TEST_CREATION_API.send_ir_rc_command("[CH_3]")
+                                    TEST_CREATION_API.send_ir_rc_command("[CH_40]")
                                 else:
                                     TEST_CREATION_API.write_log_to_file("Signal value is lower than threshold") 
                                     TEST_CREATION_API.write_log_to_file("Falhou a meio da atualização")                                 
@@ -1310,7 +1372,7 @@ def runTest():
                                     
                                     
                         else:
-                            TEST_CREATION_API.send_ir_rc_command("[CH_3]")
+                            TEST_CREATION_API.send_ir_rc_command("[CH_40]")
                             time.sleep(1)
                             TEST_CREATION_API.send_ir_rc_command("[BACK]")
                             TEST_CREATION_API.send_ir_rc_command("[BACK]")
@@ -1503,19 +1565,19 @@ def runTest():
                                     Install_image = NOS_API.wait_for_multiple_pictures(["Install_Success_ref","Install_Success_ref2", "Install_Success_ref3"], 5, ["[SEARCH]","[SEARCH_720]","[SEARCH_720]"], [HDMI_Threshold,HDMI_Threshold,HDMI_Threshold])
                                     if(Install_image != 0 and Install_image != 1 and Install_image != 2):
                                         TEST_CREATION_API.send_ir_rc_command("[OK]")
-                                    Install_Success_image = NOS_API.wait_for_multiple_pictures(["Install_Success_ref","Install_Success_ref1","Install_Success_ref2", "Install_Success_ref3"], 30, ["[SUCCESS_INSTALL]","[SUCCESS_INSTALL]","[SUCCESS_INSTALL_720]","[SUCCESS_INSTALL_720]"], [HDMI_Threshold,HDMI_Threshold,HDMI_Threshold,HDMI_Threshold])
+                                    Install_Success_image = NOS_API.wait_for_multiple_pictures(["Install_Success_ref","Install_Success_ref1","Install_Success_ref2", "Install_Success_ref3"], 300, ["[SUCCESS_INSTALL]","[SUCCESS_INSTALL]","[SUCCESS_INSTALL_720]","[SUCCESS_INSTALL_720]"], [HDMI_Threshold,HDMI_Threshold,HDMI_Threshold,HDMI_Threshold])
                                     
                                     if(Install_Success_image == 0 or Install_Success_image == 1):
                                         TEST_CREATION_API.send_ir_rc_command("[OK]")
                                         TEST_CREATION_API.send_ir_rc_command("[BACK]")
-                                        TEST_CREATION_API.send_ir_rc_command("[CH_3]")
+                                        TEST_CREATION_API.send_ir_rc_command("[CH_40]")
                                     elif(Install_Success_image == 2 or Install_Success_image == 3):
                                         TEST_CREATION_API.send_ir_rc_command("[OK]")
                                         TEST_CREATION_API.send_ir_rc_command("[BACK]")
-                                        TEST_CREATION_API.send_ir_rc_command("[CH_3]")
+                                        TEST_CREATION_API.send_ir_rc_command("[CH_40]")
                                         time.sleep(10)
                                         TEST_CREATION_API.send_ir_rc_command("[BACK]")
-                                        TEST_CREATION_API.send_ir_rc_command("[CH_3]")
+                                        TEST_CREATION_API.send_ir_rc_command("[CH_40]")
                                     else:
                                         TEST_CREATION_API.write_log_to_file("Signal value is lower than threshold") 
                                         TEST_CREATION_API.write_log_to_file("Falhou a meio da atualização")                                 
@@ -1670,14 +1732,76 @@ def runTest():
                                     TEST_CREATION_API.send_ir_rc_command("[POWER]")
                                 liga = False
                             TEST_CREATION_API.send_ir_rc_command("[BACK]")
-                            TEST_CREATION_API.send_ir_rc_command("[CH_3]")
-                            signal_image = NOS_API.wait_for_multiple_pictures(["HDMI_Video_1080_ref", "HDMI_Video_1080_ref_1", "HDMI_Video_1080_ref_2", "HDMI_Video_720_ref","HDMI_Video_720_ref_1","HDMI_Video_720_ref_2","No_signal_1080p_ref","No_signal_720p_ref","Install_ref","Install_ref_1"], 10, ["[HALF_SCREEN_1080]","[HALF_SCREEN_1080]","[HALF_SCREEN_1080]","[HALF_SCREEN_720]","[HALF_SCREEN_720]","[HALF_SCREEN_720]","[NO_SIGNAL_1080]","[NO_SIGNAL_720]","[Install_menu]","[Install_menu]"], [HDMI_Threshold,HDMI_Threshold,HDMI_Threshold,HDMI_Threshold,HDMI_Threshold,HDMI_Threshold,HDMI_Threshold,HDMI_Threshold,HDMI_Threshold,HDMI_Threshold])
-                            if(signal_image >= 0 and signal_image <= 5):
+                            TEST_CREATION_API.send_ir_rc_command("[CH_40]")
+                            signal_image = NOS_API.wait_for_multiple_pictures(["HDMI_Video_1080_ref", "HDMI_Video_1080_ref_1", "HDMI_Video_1080_ref_2", "HDMI_Video_720_ref","HDMI_Video_720_ref_1","HDMI_Video_720_ref_2","No_signal_1080p_ref","No_signal_720p_ref","No_signal_720p_new_ref","Install_ref","Install_ref_1","Search_Channels_ref", "Search_Channels1080_ref"], 10, ["[HALF_SCREEN_1080]","[HALF_SCREEN_1080]","[HALF_SCREEN_1080]","[HALF_SCREEN_720]","[HALF_SCREEN_720]","[HALF_SCREEN_720]","[NO_SIGNAL_1080]","[NO_SIGNAL_720]","[NO_SIGNAL_720]","[Install_menu]","[Install_menu]","[Search_Channels]","[Search_Channels_1080]"], [HDMI_Threshold,HDMI_Threshold,HDMI_Threshold,HDMI_Threshold,HDMI_Threshold,HDMI_Threshold,HDMI_Threshold,HDMI_Threshold,HDMI_Threshold,HDMI_Threshold,HDMI_Threshold,HDMI_Threshold, HDMI_Threshold])
+                            if signal_image == 11 or signal_image == 12:
+                                result = 0
+                                start_time = int(time.time())
+                                while(result == 0):
+                                    time.sleep(5)
+                                    result = NOS_API.wait_for_multiple_pictures(["Search_Channels_ref","Search_Channels1080_ref"], 2, ["[Search_Channels]","[Search_Channels_1080]"], [HDMI_Threshold, HDMI_Threshold])
+                                    timeout = int(time.time()) - start_time
+                                    if (timeout > 240):
+                                        TEST_CREATION_API.write_log_to_file("Image is not displayed on HDMI")
+                                        NOS_API.update_test_slot_comment("Error code = " + NOS_API.test_cases_results_info.image_absence_hdmi_error_code \
+                                                                + "; Error message: " + NOS_API.test_cases_results_info.image_absence_hdmi_error_message)
+                                        NOS_API.set_error_message("Video HDMI")
+                                        error_codes = NOS_API.test_cases_results_info.image_absence_hdmi_error_code
+                                        error_messages = NOS_API.test_cases_results_info.image_absence_hdmi_error_message
+                                        test_result = "FAIL"
+                                        
+                                        NOS_API.add_test_case_result_to_file_report(
+                                                        test_result,
+                                                        "- - - - - - - - - - - - - - - - - - - -",
+                                                        "- - - - - - - - - - - - - - - - - - - -",
+                                                        error_codes,
+                                                        error_messages)
+                                        end_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S') 
+                                        report_file = ""
+                                        if (test_result != "PASS"):
+                                            report_file = NOS_API.create_test_case_log_file(
+                                                            NOS_API.test_cases_results_info.s_n_using_barcode,
+                                                            NOS_API.test_cases_results_info.nos_sap_number,
+                                                            NOS_API.test_cases_results_info.cas_id_using_barcode,
+                                                            NOS_API.test_cases_results_info.mac_using_barcode,
+                                                            end_time)
+                                            NOS_API.upload_file_report(report_file)
+                                            NOS_API.test_cases_results_info.isTestOK = False
+
+
+                                        ## Update test result
+                                        TEST_CREATION_API.update_test_result(test_result)
+                                        
+                                        ## Return DUT to initial state and de-initialize grabber device
+                                        NOS_API.deinitialize()
+                                        
+                                        NOS_API.send_report_over_mqtt_test_plan(
+                                            test_result,
+                                            end_time,
+                                            error_codes,
+                                            report_file)
+                                        return        
+
+                                time.sleep(10)
+                                TEST_CREATION_API.send_ir_rc_command("[CH_40]")
+                                Status_Image = NOS_API.wait_for_multiple_pictures(["HDMI_Video_1080_ref","HDMI_Video_1080_ref_1","HDMI_Video_1080_ref_2","HDMI_Video_720_ref","HDMI_Video_720_ref_1","HDMI_Video_720_ref_2"], 5, ["[HALF_SCREEN_1080]","[HALF_SCREEN_1080]","[HALF_SCREEN_1080]","[HALF_SCREEN_720]","[HALF_SCREEN_720]","[HALF_SCREEN_720]"], [HDMI_Threshold,HDMI_Threshold,HDMI_Threshold,HDMI_Threshold,HDMI_Threshold,HDMI_Threshold])
+                                if(Status_Image >= 0 and Status_Image <= 5): 
+                                    if(Status_Image == 3 or Status_Image == 4 or Status_Image == 5):
+                                        NOS_API.SET_720 = True
+                                    test_result = "PASS"
+                                else:
+                                    TEST_CREATION_API.write_log_to_file("Image is not reproduced correctly on HDMI.")
+                                    NOS_API.update_test_slot_comment("Error code: " + NOS_API.test_cases_results_info.hdmi_1080p_noise_error_code \
+                                                                        + "; Error message: " + NOS_API.test_cases_results_info.hdmi_1080p_noise_error_message)
+                                    error_codes = NOS_API.test_cases_results_info.hdmi_1080p_noise_error_code
+                                    error_messages = NOS_API.test_cases_results_info.hdmi_1080p_noise_error_message
+                                    NOS_API.set_error_message("Video HDMI")
+                            elif(signal_image >= 0 and signal_image <= 5):
                                 if(signal_image == 3 or signal_image == 5):
                                     NOS_API.SET_720 = True
                                 test_result = "PASS"
                                 counter = 3
-                            elif(signal_image >= 6 and signal_image <= 7):
+                            elif(signal_image >= 6 and signal_image <= 8):
                                 if(counter == 0):
                                     NOS_API.display_custom_dialog("Confirme o cabo RF", 1, ["Continuar"], NOS_API.WAIT_TIME_TO_CLOSE_DIALOG)
                                     time.sleep(5)
@@ -1834,7 +1958,7 @@ def runTest():
                                     
                                     
                                 counter += 1
-                            elif(signal_image == 8 or signal_image == 9):
+                            elif(signal_image == 9 or signal_image == 10):
                                 TEST_CREATION_API.send_ir_rc_command("[OK]")
                                 signal_image = NOS_API.wait_for_multiple_pictures(["Install_ref","Install_ref_1","Set_signal_ref"], 10, ["[Install_menu]","[Install_menu]","[NO_INSTALL]"], [HDMI_Threshold,HDMI_Threshold,HDMI_Threshold])
                                 if(signal_image == 0 or signal_image == 1):
@@ -1929,7 +2053,7 @@ def runTest():
                                     Install_image = NOS_API.wait_for_multiple_pictures(["Install_Success_ref","Install_Success_ref2", "Install_Success_ref3"], 5, ["[SEARCH]","[SEARCH_720]","[SEARCH_720]"], [HDMI_Threshold, HDMI_Threshold, HDMI_Threshold])
                                     if(Install_image != 0 and Install_image != 1 and Install_image != 2):
                                         TEST_CREATION_API.send_ir_rc_command("[OK]")
-                                    Install_Success_image = NOS_API.wait_for_multiple_pictures(["Install_Success_ref","Install_Success_ref1","Install_Success_ref2", "Install_Success_ref3"], 30, ["[SUCCESS_INSTALL]","[SUCCESS_INSTALL]","[SUCCESS_INSTALL_720]","[SUCCESS_INSTALL_720]"], [HDMI_Threshold,HDMI_Threshold,HDMI_Threshold,HDMI_Threshold])
+                                    Install_Success_image = NOS_API.wait_for_multiple_pictures(["Install_Success_ref","Install_Success_ref1","Install_Success_ref2", "Install_Success_ref3"], 300, ["[SUCCESS_INSTALL]","[SUCCESS_INSTALL]","[SUCCESS_INSTALL_720]","[SUCCESS_INSTALL_720]"], [HDMI_Threshold,HDMI_Threshold,HDMI_Threshold,HDMI_Threshold])
                                     
                                     if(Install_Success_image == 0 or Install_Success_image == 1 or Install_Success_image == 2 or Install_Success_image == 3):
                                         TEST_CREATION_API.send_ir_rc_command("[OK]")

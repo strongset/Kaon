@@ -223,7 +223,7 @@ def runTest():
                         return
         
                 
-                MAC = fix(TEST_CREATION_API.OCR_recognize_text("Tech_info", "[MAC]", "[KAON_FILTER]","MAC"))
+                MAC = fixMAC(fix(TEST_CREATION_API.OCR_recognize_text("Tech_info", "[MAC]", "[KAON_FILTER]","MAC")))
                 SW = fix(TEST_CREATION_API.OCR_recognize_text("Tech_info", "[SW]", "[KAON_FILTER]","SW"))
                 CAS_ID = fix(TEST_CREATION_API.OCR_recognize_text("Tech_info", "[CASID]", "[KAON_FILTER]","CASID"))
                 IP = TEST_CREATION_API.OCR_recognize_text("Tech_info", "[IP]", "[KAON_FILTER]","IP")
@@ -412,7 +412,7 @@ def runTest():
                         return
                     
                     else:
-                        SC = fix(TEST_CREATION_API.OCR_recognize_text("Tech_info", "[SC]","[KAON_FILTER]","SC"))
+                        SC = fix(TEST_CREATION_API.OCR_recognize_text("SC_Retry", "[SC]","[KAON_FILTER]","SC"))
                         TEST_CREATION_API.write_log_to_file("Smartcard: " + str(SC)) 
                 else:
                     SC = fix(TEST_CREATION_API.OCR_recognize_text("Tech_info", "[SC]","[KAON_FILTER]","SC"))
@@ -669,7 +669,7 @@ def runTest():
                     TEST_CREATION_API.send_ir_rc_command("[BACK]")
                     TEST_CREATION_API.send_ir_rc_command("[BACK]")
                     if(video_result1 < TEST_CREATION_API.DEFAULT_HDMI_VIDEO_THRESHOLD):
-                        TEST_CREATION_API.send_ir_rc_command("[CH_3]")
+                        TEST_CREATION_API.send_ir_rc_command("[CH_40]")
                         
                     TEST_CREATION_API.send_ir_rc_command("[Signal_INFO_RETRY]")
                     if not(NOS_API.grab_picture("Signal_Hor_info")):
@@ -1042,7 +1042,7 @@ def runTest():
                 
                 
                 
-                TEST_CREATION_API.send_ir_rc_command("[CH_3]")
+                TEST_CREATION_API.send_ir_rc_command("[CH_40]")
                 time.sleep(2)
                 TEST_CREATION_API.send_ir_rc_command("[BACK]")
                 TEST_CREATION_API.send_ir_rc_command("[BACK]")
@@ -1292,6 +1292,20 @@ def fix(input_text):
         
         
     return output_text.upper()
+
+def fixMAC(input_text):   
+    output_text = input_text
+    # Remove . from string
+    if ("‘" in output_text):
+        output_text = output_text.replace('‘', '') 
+
+    if ("l" in output_text):
+        output_text = output_text.replace('l', '1')   
+
+    if ("-" in output_text):
+        output_text = output_text.replace('-', '')  
+        
+    return output_text
 
    
 def change_ber(input_text):
